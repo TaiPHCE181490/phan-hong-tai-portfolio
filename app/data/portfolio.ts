@@ -211,7 +211,7 @@ export const education = {
   school: "FPT University - Can Tho Campus",
   period: "2022 - 10/2026",
   status: "Completed all academic requirements. Awaiting provisional graduation certificate (Oct 2026).",
-  gpa: "3.2 / 4.0",
+  gpa: "3.16 / 4.0",
   coursework: [
     "OOP",
     "Web Development",
