@@ -7,7 +7,7 @@ export const profile = {
   tagline:
     "Backend-focused developer building reliable APIs, data-driven systems, and clean full-stack experiences.",
   summary:
-    "Software Engineering student at FPT University - Can Tho Campus (expected Aug 2026). I focus on backend development and full-stack academic projects with strengths in RESTful APIs, SQL databases, authentication, payment integration, and microservices. I collaborate closely with teams and use AI tools such as ChatGPT and Copilot to support coding, debugging, refactoring, and productivity.",
+    "Software Engineering graduate from FPT University - Can Tho Campus (Oct 2026). I focus on backend development and full-stack projects with strengths in RESTful APIs, SQL databases, authentication, payment integration, and microservices. I collaborate closely with teams and leverage AI tools such as ChatGPT and Copilot to support coding, debugging, refactoring, and productivity.",
   techBadges: [
     "Node.js",
     ".NET",
@@ -210,7 +210,7 @@ export const education = {
   degree: "Software Engineering",
   school: "FPT University - Can Tho Campus",
   period: "2022 - 10/2026",
-  status: "Đã hoàn thành chương trình học, chuẩn bị nhận bằng tốt nghiệp tạm thời.",
+  status: "Completed all academic requirements. Awaiting provisional graduation certificate (Oct 2026).",
   gpa: "3.2 / 4.0",
   coursework: [
     "OOP",
