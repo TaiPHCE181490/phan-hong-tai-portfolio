@@ -85,7 +85,6 @@ body {
 .gallery-tile {
   position: relative;
   z-index: 1;
-  height: clamp(480px, 52vw, 560px);
 }
 
 .gallery-tile::after {
@@ -107,7 +106,7 @@ body {
 }
 
 .gallery-tile > article {
-  height: 100%;
+  height: auto;
 }
 
 @media (min-width: 768px) {

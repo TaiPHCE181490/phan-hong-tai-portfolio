@@ -16,6 +16,8 @@ export const profile = {
     "SQL Server",
     "JWT Auth",
     "Microservices",
+    "Unity",
+    "C#",
   ],
 };
 
@@ -60,6 +62,39 @@ export const skills = [
 ];
 
 export const projects = [
+  {
+    name: "Mystic Journey",
+    type: "2D Game & Integrated Web System",
+    role: "Developer & QA Engineer",
+    teamSize: "4 members",
+    stack: [
+      "Unity",
+      "C#",
+      "Photon Fusion",
+      "Next.js",
+      "ASP.NET Core API",
+      "PostgreSQL",
+      "JWT",
+      "Cloudinary",
+      "Vercel",
+      "Docker",
+      "VPS",
+    ],
+    highlights: [
+      "Integrated and deployed Web Office (user-facing) & Admin dashboard (Next.js, ASP.NET Core API) connected to the Unity 2D game for managing player data stored on PostgreSQL.",
+      "Conducted unit testing (1,298 test cases) and system testing (589 test cases), tracked and managed bugs with Excel.",
+      "Developed full Backend, Frontend, and Unity modules: inventory/bag system, story missions, item shop, and daily check-in system.",
+      "Integrated JWT authentication, Cloudinary image uploads, and email notification services.",
+    ],
+    repoUrl: "https://github.com/Tngh1/SEP490-Mystic-Journey",
+    demoUrl: "https://mystic-journey.io.vn/download",
+    extraRepoUrls: [
+      { label: "Backend", url: "https://github.com/Tngh1/Mystic-Journey-BE" },
+      { label: "Frontend", url: "https://github.com/Tngh1/Mystic-Journey-FE" },
+    ],
+    period: "05/2026 – 08/2026",
+    category: "Capstone Project (SEP490)",
+  },
   {
     name: "Lumiread",
     type: "Used Book Marketplace & Auction Platform",
@@ -129,6 +164,17 @@ export const projects = [
 
 export const experience = [
   {
+    title: "Mystic Journey",
+    role: "Developer & QA Engineer | Capstone Project (SEP490)",
+    period: "05/2026 – 08/2026",
+    details: [
+      "Built full-stack game ecosystem: Unity 2D game + Web Office + Admin dashboard integrated with PostgreSQL.",
+      "Owned backend, frontend & Unity modules: bag/inventory, item shop, daily check-in, story missions.",
+      "Executed 1,298 unit tests & 589 system tests; managed defect lifecycle via Excel reporting.",
+      "Integrated JWT auth, Cloudinary uploads, and email notifications across services.",
+    ],
+  },
+  {
     title: "Lumiread",
     role: "Full Stack Developer",
     period: "2025",
@@ -163,7 +209,8 @@ export const experience = [
 export const education = {
   degree: "Software Engineering",
   school: "FPT University - Can Tho Campus",
-  period: "2022 - Aug 2026 (expected)",
+  period: "2022 - 10/2026",
+  status: "Đã hoàn thành chương trình học, chuẩn bị nhận bằng tốt nghiệp tạm thời.",
   gpa: "3.2 / 4.0",
   coursework: [
     "OOP",

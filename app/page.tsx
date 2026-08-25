@@ -122,10 +122,13 @@ export default function Home() {
                   {profile.role}
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200">
-                    <span className="text-3xl font-semibold text-slate-700">
-                      {profile.name.charAt(0)}
-                    </span>
+                  <div className="h-24 w-24 overflow-hidden rounded-full shadow-sm ring-1 ring-slate-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/avatar.jpg"
+                      alt={profile.name}
+                      className="h-full w-full object-cover object-top"
+                    />
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
@@ -191,12 +194,13 @@ export default function Home() {
           />
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="rounded-[2.5rem] bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-              <div className="aspect-[4/5] rounded-[2rem] bg-gradient-to-b from-violet-100 via-white to-fuchsia-50 p-6">
-                <div className="flex h-full items-end justify-center rounded-[1.75rem] bg-white/80 shadow-inner ring-1 ring-white">
-                  <span className="mb-10 text-6xl font-semibold text-violet-400">
-                    {profile.name.charAt(0)}
-                  </span>
-                </div>
+              <div className="aspect-[4/5] overflow-hidden rounded-[2rem]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/avatar.jpg"
+                  alt={profile.name}
+                  className="h-full w-full object-cover object-top"
+                />
               </div>
               <div className="mt-6 space-y-2 text-sm text-slate-600">
                 <p>
@@ -289,6 +293,12 @@ export default function Home() {
             <div className="mt-6 text-sm font-semibold text-slate-500">
               GPA: <span className="text-violet-600">{education.gpa}</span>
             </div>
+            {education.status && (
+              <div className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-200/60">
+                <span className="mt-0.5 shrink-0 text-emerald-500">✓</span>
+                <span>{education.status}</span>
+              </div>
+            )}
             <div className="mt-6 flex flex-wrap gap-2">
               {education.coursework.map((item) => (
                 <Badge key={item} tone="muted">
