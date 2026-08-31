@@ -12,31 +12,36 @@ export function TimelineItem({
   details,
 }: TimelineItemProps) {
   return (
-    <div className="group relative">
+    <div className="group relative h-full">
       <div
-        className="absolute inset-0 -translate-x-2 translate-y-2 rounded-[2.25rem] bg-violet-100/60"
+        className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-r from-violet-600/20 via-indigo-500/20 to-fuchsia-600/20 opacity-0 blur-xl transition-all duration-500 group-hover:opacity-100"
         aria-hidden="true"
       />
-      <div className="relative rounded-[2.25rem] bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5 transition hover:-translate-y-2 hover:shadow-[0_28px_60px_rgba(167,139,250,0.18)]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 className="text-xl font-semibold tracking-tight text-slate-900 transition-colors group-hover:text-violet-700">
-              {title}
-            </h3>
-            <p className="mt-1 text-sm font-medium text-slate-500">{role}</p>
+      <div className="relative flex h-full flex-col justify-between rounded-[2.25rem] glass-art-card p-8 text-slate-100 transition-all duration-500 group-hover:-translate-y-2">
+        <div>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h3 className="font-art-title text-2xl font-bold tracking-wide text-white group-hover:text-slate-100 transition-all duration-300">
+                {title}
+              </h3>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                {role}
+              </p>
+            </div>
+            <span className="rounded-full bg-violet-500/15 border border-violet-500/30 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-violet-300 shadow-[0_0_12px_rgba(124,58,237,0.2)]">
+              {period}
+            </span>
           </div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-violet-500">
-            {period}
-          </span>
+
+          <ul className="mt-6 space-y-3 text-sm leading-relaxed text-slate-300">
+            {details.map((detail) => (
+              <li key={detail} className="flex items-start gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 shadow-[0_0_8px_#c084fc]" />
+                <span>{detail}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="mt-5 space-y-3 text-sm leading-relaxed text-slate-600">
-          {details.map((detail) => (
-            <li key={detail} className="flex gap-3">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 opacity-60 group-hover:opacity-100 transition-opacity" />
-              <span>{detail}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

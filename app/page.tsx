@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   awards,
   certificates,
@@ -12,29 +17,182 @@ import { ProjectCard } from "./components/ProjectCard";
 import { SectionHeading } from "./components/SectionHeading";
 import { SkillCard } from "./components/SkillCard";
 import { TimelineItem } from "./components/TimelineItem";
+import { MonetVanGoghCanvas } from "./components/MonetVanGoghCanvas";
+import { ImpressionistCursor } from "./components/ImpressionistCursor";
+import { ImpressionistIntro } from "./components/ImpressionistIntro";
+import { Artistic3DMascot } from "./components/Artistic3DMascot";
+import { ProjectCrystalOrb } from "./components/ProjectCrystalOrb";
+import { BioEtherSphere } from "./components/BioEtherSphere";
+import { TimelineClock3D } from "./components/TimelineClock3D";
+import { SkillNodeCube } from "./components/SkillNodeCube";
+import { AcademicLaurel3D } from "./components/AcademicLaurel3D";
+import {
+  Sparkles,
+  Mail,
+  Award,
+  GraduationCap,
+  CheckCircle2,
+  Compass,
+} from "lucide-react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+      />
+    </svg>
+  );
+}
 
 const stats = [
-  { label: "Projects", value: `${projects.length}` },
-  { label: "Skill groups", value: `${skills.length}` },
-  { label: "Experience", value: `${experience.length}` },
-  { label: "Awards", value: `${awards.length}` },
+  { label: "Completed Projects", value: `${projects.length}` },
+  { label: "Core Skill Groups", value: `${skills.length}` },
+  { label: "Hands-on Experience", value: `${experience.length}` },
+  { label: "Awards & Credentials", value: `${awards.length + certificates.length}` },
 ];
 
+export type ThemeId = "gold" | "sapphire" | "iris" | "white";
+
+interface ThemePreset {
+  id: ThemeId;
+  hex: string;
+  name: string;
+  gradientClass: string;
+  btnGradientClass: string;
+  badgeTone: "gold" | "default" | "accent" | "muted";
+  borderColor: string;
+}
+
+const THEME_PRESETS: Record<ThemeId, ThemePreset> = {
+  gold: {
+    id: "gold",
+    hex: "#d4af37",
+    name: "Moonlit Gold",
+    gradientClass: "text-gold-gradient",
+    btnGradientClass: "from-amber-500 via-amber-600 to-indigo-600 text-slate-950",
+    badgeTone: "gold",
+    borderColor: "rgba(212,175,55,0.4)",
+  },
+  sapphire: {
+    id: "sapphire",
+    hex: "#38bdf8",
+    name: "Sapphire Blue",
+    gradientClass: "text-sapphire-gradient",
+    btnGradientClass: "from-sky-400 via-blue-500 to-indigo-600 text-slate-950",
+    badgeTone: "default",
+    borderColor: "rgba(56,189,248,0.4)",
+  },
+  iris: {
+    id: "iris",
+    hex: "#c084fc",
+    name: "Iris Purple",
+    gradientClass: "text-iris-gradient",
+    btnGradientClass: "from-purple-400 via-fuchsia-500 to-pink-600 text-slate-950",
+    badgeTone: "accent",
+    borderColor: "rgba(192,132,252,0.4)",
+  },
+  white: {
+    id: "white",
+    hex: "#ffffff",
+    name: "Pure White",
+    gradientClass: "text-white-gradient",
+    btnGradientClass: "from-slate-100 via-slate-300 to-slate-500 text-slate-950",
+    badgeTone: "muted",
+    borderColor: "rgba(255,255,255,0.4)",
+  },
+};
+
 export default function Home() {
+  const [showIntro, setShowIntro] = useState(true);
+  const [currentTheme, setCurrentTheme] = useState<ThemeId>("gold");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  const activeThemeConfig = THEME_PRESETS[currentTheme];
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(projects.map((p) => p.category).filter(Boolean))),
+  ];
+
+  const filteredProjects =
+    activeCategory === "All"
+      ? projects
+      : projects.filter((p) => p.category === activeCategory);
+
+  useEffect(() => {
+    if (showIntro) return;
+
+    const ctx = gsap.context(() => {
+      const sections = gsap.utils.toArray<HTMLElement>(".gsap-reveal-section");
+
+      sections.forEach((section) => {
+        gsap.fromTo(
+          section,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 85%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+    }, mainRef);
+
+    return () => ctx.revert();
+  }, [showIntro]);
+
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 selection:bg-violet-100 selection:text-violet-900">
-      <header className="sticky top-0 z-50 border-b border-black/5 bg-white/80 backdrop-blur-2xl">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
+    <div className="relative min-h-screen bg-[#080c16] text-slate-100 selection:bg-indigo-500/30 selection:text-white">
+      {/* 1. Dynamic WebGL Canvas (Three.js Shader Background reacting to themeColor) */}
+      <MonetVanGoghCanvas themeColor={activeThemeConfig.hex} />
+
+      {/* 2. Dual-Layer Oil Paint Cursor */}
+      <ImpressionistCursor />
+
+      {/* 3. Multi-Layer Interactive Canvas Intro */}
+      {showIntro && (
+        <ImpressionistIntro
+          onEnter={() => setShowIntro(false)}
+          onThemeChange={(themeId) => setCurrentTheme(themeId)}
+        />
+      )}
+
+      {/* 4. Glassmorphic Navigation Bar */}
+      <header className="sticky top-0 z-40 glass-art-header backdrop-blur-2xl">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-sm font-bold text-white shadow-sm shadow-violet-200/70">
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 border border-slate-700 text-sm font-bold text-slate-100 shadow-lg transition-all duration-500"
+              style={{ boxShadow: `0 0 20px ${activeThemeConfig.hex}50` }}
+            >
               PHT
             </div>
-            <div className="text-sm font-semibold text-slate-900">
-              {profile.name}
+            <div>
+              <div className={`text-base font-bold tracking-wide font-art-title ${activeThemeConfig.gradientClass} transition-all duration-500`}>
+                {profile.name}
+              </div>
+              <div className="text-[10px] font-mono tracking-widest text-slate-400 uppercase">
+                {profile.role}
+              </div>
             </div>
           </div>
+
           <nav
-            className="hidden items-center gap-6 rounded-full border border-slate-200 bg-white px-6 py-2 text-xs font-semibold uppercase tracking-widest text-slate-500 shadow-sm md:flex"
+            className="hidden items-center gap-6 rounded-full border border-slate-700/60 bg-slate-950/70 px-8 py-2.5 text-xs font-semibold uppercase tracking-widest text-slate-300 shadow-2xl md:flex"
             aria-label="Main navigation"
           >
             {[
@@ -48,81 +206,116 @@ export default function Home() {
             ].map((item) => (
               <a
                 key={item}
-                className="transition-colors hover:text-violet-600"
+                className="transition-colors hover:text-white cursor-pointer"
                 href={item === "Home" ? "#" : `#${item.toLowerCase()}`}
               >
                 {item}
               </a>
             ))}
           </nav>
-          <a
-            className="hidden rounded-full bg-violet-600 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white shadow-sm shadow-violet-200/80 transition hover:bg-violet-500 md:inline-flex"
-            href={profile.github}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Contact
-          </a>
+
+          {/* Theme Color Picker Dots in Header */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 border border-slate-800">
+              {Object.values(THEME_PRESETS).map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setCurrentTheme(t.id)}
+                  className={`w-5 h-5 rounded-full transition-transform cursor-pointer ${
+                    currentTheme === t.id ? "scale-125 ring-2 ring-white shadow-lg" : "opacity-60 hover:opacity-100"
+                  }`}
+                  style={{ backgroundColor: t.hex, boxShadow: `0 0 8px ${t.hex}` }}
+                  title={`Switch theme to ${t.name}`}
+                />
+              ))}
+            </div>
+
+            <a
+              className={`rounded-full bg-gradient-to-r ${activeThemeConfig.btnGradientClass} px-5 py-2 text-xs font-bold uppercase tracking-wider shadow-md transition-all hover:scale-105`}
+              href={profile.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-12">
-        <section className="relative overflow-hidden rounded-[2.75rem] bg-white/90 p-8 shadow-[0_22px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 md:p-14">
-          <div className="pointer-events-none absolute -left-28 -top-28 h-[520px] w-[520px] rounded-full bg-violet-200/40 blur-[100px]" />
-          <div className="pointer-events-none absolute -right-32 -bottom-32 h-[520px] w-[520px] rounded-full bg-fuchsia-200/40 blur-[100px]" />
+      {/* 5. Main Portfolio Content */}
+      <main ref={mainRef} className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-24 pt-10">
+        {/* HERO SECTION */}
+        <section
+          className="gsap-reveal-section relative overflow-hidden rounded-[3rem] glass-art-card p-8 sm:p-14 mb-24 transition-all duration-500"
+          style={{ borderColor: activeThemeConfig.borderColor }}
+        >
+          <div className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-indigo-600/10 blur-[120px]" />
+          <div className="pointer-events-none absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-slate-800/15 blur-[140px]" />
 
-          <div className="relative z-10 grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Top-Left Floating 3D Cat Mascot */}
+          <div className="absolute top-3 left-3 sm:top-5 sm:left-6 z-20 pointer-events-auto">
+            <Artistic3DMascot themeColor={activeThemeConfig.hex} />
+          </div>
+
+          <div className="relative z-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] pt-8 sm:pt-4">
             <div className="flex flex-col justify-center gap-8">
               <div className="space-y-6">
-                <div className="flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.45em] text-slate-500">
-                  <span className="rounded-full bg-violet-100/80 px-3 py-1 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200/80">
-                    {profile.location}
-                  </span>
-                  <span
-                    className="h-1 w-1 rounded-full bg-violet-300"
-                    aria-hidden="true"
-                  />
-                  <span>Studio Portfolio</span>
+                <div className="inline-flex items-center gap-3 rounded-full bg-slate-900/80 border border-slate-700/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-slate-200 shadow-md">
+                  <Sparkles className="w-3.5 h-3.5" style={{ color: activeThemeConfig.hex }} />
+                  <span>{profile.location} &bull; Software Engineering</span>
                 </div>
-                <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl">
+
+                <h1 className={`font-art-title text-5xl font-bold leading-[1.08] tracking-tight sm:text-7xl ${activeThemeConfig.gradientClass} transition-all duration-500`}>
                   {profile.name}
                 </h1>
-                <p className="max-w-xl text-lg leading-relaxed text-slate-600 sm:text-xl">
+
+                <p className="max-w-xl text-lg font-light leading-relaxed text-slate-300 sm:text-xl">
                   {profile.tagline}
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-2.5">
                 {profile.techBadges.map((badge) => (
-                  <Badge key={badge} tone="muted">
+                  <Badge key={badge} tone={activeThemeConfig.badgeTone}>
                     {badge}
                   </Badge>
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4 pt-2">
                 <a
                   href="#projects"
-                  className="inline-flex items-center justify-center rounded-full bg-violet-600 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-200/80 transition hover:-translate-y-0.5 hover:bg-violet-500"
+                  className={`inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r ${activeThemeConfig.btnGradientClass} px-8 py-4 text-sm font-bold shadow-xl transition-all duration-500 hover:scale-105`}
+                  style={{ boxShadow: `0 0 25px ${activeThemeConfig.hex}60` }}
                 >
-                  View Projects
+                  <Compass className="w-4 h-4 text-slate-950" />
+                  <span>View Selected Projects</span>
                 </a>
                 <a
                   href={`mailto:${profile.email}`}
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-8 py-4 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-violet-200 hover:text-violet-600"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-8 py-4 text-sm font-semibold text-slate-200 transition-all hover:border-slate-500 hover:bg-slate-800 hover:text-white"
                 >
-                  Contact Me
+                  <Mail className="w-4 h-4" style={{ color: activeThemeConfig.hex }} />
+                  <span>Contact Me</span>
                 </a>
               </div>
             </div>
 
+            {/* Hero Right Featured Card */}
             <div className="grid gap-6">
-              <div className="relative rounded-[2.25rem] bg-slate-50 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-                <div className="absolute -right-6 top-6 rounded-full bg-violet-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-violet-700 ring-1 ring-violet-200/80">
+              <div
+                className="relative rounded-[2.5rem] bg-slate-950/80 border p-8 shadow-2xl backdrop-blur-xl transition-all duration-500"
+                style={{ borderColor: activeThemeConfig.borderColor }}
+              >
+                <div className="absolute -right-3 -top-3 rounded-full bg-slate-900 border border-slate-700 px-3.5 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-200 shadow-md">
                   {profile.role}
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="h-24 w-24 overflow-hidden rounded-full shadow-sm ring-1 ring-slate-200">
+
+                <div className="flex items-center gap-5">
+                  <div
+                    className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 shadow-2xl transition-all duration-500"
+                    style={{ borderColor: activeThemeConfig.hex, boxShadow: `0 0 20px ${activeThemeConfig.hex}50` }}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/avatar.jpg"
@@ -131,37 +324,39 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                      Featured
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold text-slate-900">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em]" style={{ color: activeThemeConfig.hex }}>
+                      Featured Project
+                    </span>
+                    <h3 className={`mt-1 text-2xl font-bold font-art-title ${activeThemeConfig.gradientClass} transition-all duration-500`}>
                       {projects[0]?.name}
                     </h3>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-xs font-semibold text-slate-400">
                       {projects[0]?.type}
                     </p>
                   </div>
                 </div>
-                <ul className="mt-5 space-y-2 text-sm text-slate-600">
+
+                <ul className="mt-6 space-y-2.5 text-sm text-slate-300">
                   {projects[0]?.highlights.slice(0, 2).map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-violet-400" />
-                      {item}
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: activeThemeConfig.hex, boxShadow: `0 0 8px ${activeThemeConfig.hex}` }} />
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
+              {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 {stats.map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-[1.5rem] bg-white p-4 text-center shadow-sm ring-1 ring-slate-200"
+                    className="rounded-[2rem] bg-slate-950/70 border border-slate-800 p-5 text-center shadow-lg backdrop-blur-md"
                   >
-                    <p className="text-2xl font-semibold text-slate-900">
+                    <p className={`text-3xl font-bold font-art-title ${activeThemeConfig.gradientClass} transition-all duration-500`}>
                       {stat.value}
                     </p>
-                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-slate-500">
+                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
                       {stat.label}
                     </p>
                   </div>
@@ -171,87 +366,130 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="projects" className="mt-24 scroll-mt-28 space-y-10">
-          <SectionHeading
-            eyebrow="Projects"
-            title="Gallery of selected work"
-            subtitle="A studio-style wall of systems, marketplaces, and platforms."
-          />
-          <div className="gallery-wall">
-            {projects.map((project) => (
-              <div key={project.name} className="gallery-tile">
-                <ProjectCard project={project} />
+        {/* PROJECTS GALLERY SECTION */}
+        <section id="projects" className="gsap-reveal-section mt-28 scroll-mt-28 space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div className="flex items-center gap-6">
+              <SectionHeading
+                eyebrow="Gallery of Work"
+                title="Featured Selected Projects"
+                subtitle="Production systems, agricultural auction marketplace, capstone game ecosystem, and microservices."
+              />
+              <div className="hidden sm:block">
+                <ProjectCrystalOrb />
               </div>
+            </div>
+
+            {/* Category Filter Chips */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat as string)}
+                  className={`rounded-full px-4 py-2 text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer ${
+                    activeCategory === cat
+                      ? "bg-white text-slate-950 font-bold shadow-lg"
+                      : "bg-slate-900/70 border border-slate-800 text-slate-300 hover:border-slate-500 hover:text-white"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="gallery-art-wall">
+            {filteredProjects.map((project) => (
+              <ProjectCard key={project.name} project={project} />
             ))}
           </div>
         </section>
 
-        <section id="about" className="mt-24 scroll-mt-28 space-y-10">
-          <SectionHeading
-            eyebrow="About"
-            title="Studio biography"
-            subtitle={profile.summary}
-          />
+        {/* ABOUT SECTION */}
+        <section id="about" className="gsap-reveal-section mt-28 scroll-mt-28 space-y-10">
+          <div className="flex items-center justify-between gap-6">
+            <SectionHeading
+              eyebrow="Biography & Vision"
+              title="Studio Biography & Statement"
+              subtitle={profile.summary}
+            />
+            <div className="hidden sm:block">
+              <BioEtherSphere />
+            </div>
+          </div>
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-[2.5rem] bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-              <div className="aspect-[4/5] overflow-hidden rounded-[2rem]">
+            <div className="rounded-[2.5rem] glass-art-card p-8 text-slate-100">
+              <div className="aspect-[4/5] overflow-hidden rounded-[2rem] border border-slate-700/50 shadow-2xl relative">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/avatar.jpg"
                   alt={profile.name}
                   className="h-full w-full object-cover object-top"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
               </div>
-              <div className="mt-6 space-y-2 text-sm text-slate-600">
+              <div className="mt-6 space-y-3 text-sm text-slate-300">
                 <p>
-                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.3em]" style={{ color: activeThemeConfig.hex }}>
                     Location
                   </span>
                   <br />
-                  {profile.location}
+                  <span className="font-semibold text-slate-100">{profile.location}</span>
                 </p>
                 <p>
-                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                    Email
+                  <span className="text-[10px] font-mono uppercase tracking-[0.3em]" style={{ color: activeThemeConfig.hex }}>
+                    Direct Email
                   </span>
                   <br />
-                  {profile.email}
+                  <span className="font-semibold text-slate-100">{profile.email}</span>
                 </p>
               </div>
             </div>
-            <div className="rounded-[2.5rem] bg-white/90 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
-                Statement
-              </p>
-              <p className="mt-4 text-lg leading-relaxed text-slate-600">
-                {profile.summary}
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+
+            <div className="rounded-[2.5rem] glass-art-card p-8 sm:p-12 flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-[0.35em]" style={{ color: activeThemeConfig.hex }}>
+                  Engineering Statement
+                </span>
+                <p className="mt-4 text-lg font-light leading-relaxed text-slate-200">
+                  {profile.summary}
+                </p>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-4 pt-6 border-t border-slate-800">
                 <a
                   href={profile.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-700"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-800 border border-slate-700 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-slate-200 hover:border-slate-500 hover:text-white transition-all"
                 >
-                  GitHub
+                  <GithubIcon className="w-4 h-4 text-slate-300" />
+                  <span>GitHub Profile</span>
                 </a>
                 <a
                   href={`mailto:${profile.email}`}
-                  className="inline-flex items-center rounded-full bg-violet-600 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white"
+                  className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${activeThemeConfig.btnGradientClass} px-5 py-2.5 text-xs font-bold uppercase tracking-wider shadow-lg transition-all hover:scale-105`}
                 >
-                  Email
+                  <Mail className="w-4 h-4 text-slate-950" />
+                  <span>Direct Email</span>
                 </a>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="experience" className="mt-24 scroll-mt-28 space-y-10">
-          <SectionHeading
-            eyebrow="Experience"
-            title="Collaboration timeline"
-            subtitle="Roles, responsibilities, and teamwork highlights."
-          />
+        {/* EXPERIENCE TIMELINE SECTION */}
+        <section id="experience" className="gsap-reveal-section mt-28 scroll-mt-28 space-y-10">
+          <div className="flex items-center justify-between gap-6">
+            <SectionHeading
+              eyebrow="Work Experience"
+              title="Project & Engineering Timeline"
+              subtitle="Key roles, technical contributions, QA test execution, and collaboration."
+            />
+            <div className="hidden sm:block">
+              <TimelineClock3D />
+            </div>
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
             {experience.map((item) => (
               <TimelineItem key={item.title} {...item} />
@@ -259,12 +497,18 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="skills" className="mt-24 scroll-mt-28 space-y-10">
-          <SectionHeading
-            eyebrow="Skills"
-            title="Studio capabilities"
-            subtitle="Backend systems, modern frontend tools, and pragmatic engineering practices."
-          />
+        {/* SKILLS SECTION */}
+        <section id="skills" className="gsap-reveal-section mt-28 scroll-mt-28 space-y-10">
+          <div className="flex items-center justify-between gap-6">
+            <SectionHeading
+              eyebrow="Capabilities"
+              title="Engineering Capabilities & Stack"
+              subtitle="Backend microservices, modern frontend tools, databases, and pragmatic developer practices."
+            />
+            <div className="hidden sm:block">
+              <SkillNodeCube />
+            </div>
+          </div>
           <div className="grid gap-6 md:grid-cols-2">
             {skills.map((group) => (
               <SkillCard key={group.category} group={group} />
@@ -272,34 +516,43 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="education" className="mt-24 scroll-mt-28 space-y-10">
-          <SectionHeading
-            eyebrow="Education"
-            title="FPT University - Can Tho Campus"
-            subtitle="Formal training focused on software engineering fundamentals."
-          />
-          <div className="rounded-[2.25rem] bg-white/90 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
+        {/* EDUCATION SECTION */}
+        <section id="education" className="gsap-reveal-section mt-28 scroll-mt-28 space-y-10">
+          <div className="flex items-center justify-between gap-6">
+            <SectionHeading
+              eyebrow="Education"
+              title="Formal Academic Training"
+              subtitle="Software Engineering degree program at FPT University."
+            />
+            <div className="hidden sm:block">
+              <AcademicLaurel3D />
+            </div>
+          </div>
+          <div className="rounded-[2.5rem] glass-art-card p-8 sm:p-12">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h3 className="text-2xl font-semibold tracking-tight text-slate-900">
+                <h3 className={`font-art-title text-3xl font-bold tracking-tight ${activeThemeConfig.gradientClass} transition-all duration-500`}>
                   {education.degree}
                 </h3>
-                <p className="mt-1 text-sm font-medium text-slate-500">
+                <p className="mt-1 text-base font-semibold text-slate-300">
                   {education.school}
                 </p>
               </div>
-              <Badge tone="accent">{education.period}</Badge>
+              <Badge tone={activeThemeConfig.badgeTone}>{education.period}</Badge>
             </div>
-            <div className="mt-6 text-sm font-semibold text-slate-500">
-              GPA: <span className="text-violet-600">{education.gpa}</span>
+
+            <div className="mt-6 text-sm font-semibold text-slate-300">
+              Cumulative GPA: <span className="font-bold text-lg" style={{ color: activeThemeConfig.hex }}>{education.gpa}</span>
             </div>
+
             {education.status && (
-              <div className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700 ring-1 ring-emerald-200/60">
-                <span className="mt-0.5 shrink-0 text-emerald-500">✓</span>
+              <div className="mt-4 flex items-center gap-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 px-5 py-3 text-sm text-emerald-300 shadow-md">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
                 <span>{education.status}</span>
               </div>
             )}
-            <div className="mt-6 flex flex-wrap gap-2">
+
+            <div className="mt-6 flex flex-wrap gap-2.5">
               {education.coursework.map((item) => (
                 <Badge key={item} tone="muted">
                   {item}
@@ -309,35 +562,37 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-24 grid gap-8 lg:grid-cols-2">
-          <div className="space-y-8">
+        {/* AWARDS & CERTIFICATES SECTION */}
+        <section className="gsap-reveal-section mt-28 grid gap-8 lg:grid-cols-2">
+          <div className="space-y-6">
             <SectionHeading
               eyebrow="Awards"
-              title="Recognition"
-              subtitle="Academic highlights and achievements."
+              title="Academic Honors"
+              subtitle="Consistently recognized for academic performance."
             />
-            <div className="rounded-[2.25rem] bg-white/90 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-              <ul className="space-y-4 text-sm font-medium leading-relaxed text-slate-600">
+            <div className="rounded-[2.5rem] glass-art-card p-8">
+              <ul className="space-y-4 text-sm font-medium leading-relaxed text-slate-300">
                 {awards.map((award) => (
                   <li key={award} className="flex items-start gap-4">
-                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-violet-400" />
+                    <Award className="w-5 h-5 shrink-0 mt-0.5" style={{ color: activeThemeConfig.hex }} />
                     <span>{award}</span>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className="space-y-8">
+
+          <div className="space-y-6">
             <SectionHeading
               eyebrow="Certificates"
-              title="Continuous learning"
-              subtitle="Credentials that reinforce practical skills."
+              title="Professional Certifications"
+              subtitle="Continuous skill enhancement and training."
             />
-            <div className="rounded-[2.25rem] bg-white/90 p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-              <ul className="space-y-4 text-sm font-medium leading-relaxed text-slate-600">
+            <div className="rounded-[2.5rem] glass-art-card p-8">
+              <ul className="space-y-4 text-sm font-medium leading-relaxed text-slate-300">
                 {certificates.map((certificate) => (
                   <li key={certificate} className="flex items-start gap-4">
-                    <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-fuchsia-400" />
+                    <GraduationCap className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
                     <span>{certificate}</span>
                   </li>
                 ))}
@@ -346,66 +601,58 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className="mt-24 scroll-mt-28 pb-10">
-          <div className="relative overflow-hidden rounded-[3rem] bg-white/90 p-10 shadow-[0_22px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 md:p-16">
-            <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-violet-200/40 blur-[100px]" />
-            <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-fuchsia-200/40 blur-[100px]" />
+        {/* CONTACT SECTION */}
+        <section id="contact" className="gsap-reveal-section mt-28 scroll-mt-28 pb-10">
+          <div className="relative overflow-hidden rounded-[3rem] glass-art-card p-10 sm:p-16 text-slate-100">
+            <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-indigo-600/15 blur-[100px]" />
+            <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-slate-800/20 blur-[100px]" />
 
-            <div className="relative z-10 w-full max-w-2xl">
+            <div className="relative z-10 w-full max-w-2xl space-y-8">
               <SectionHeading
-                eyebrow="Contact"
-                title="Let's build something elegant"
-                subtitle="Open to internship and junior developer opportunities. Reach out anytime."
+                eyebrow="Get In Touch"
+                title="Let's Build Something Exceptional"
+                subtitle="Open to internship and junior software engineering roles. Feel free to contact me anytime."
               />
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <a
                   href={`mailto:${profile.email}`}
-                  className="inline-flex items-center justify-center rounded-full bg-violet-600 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-violet-200/80 transition hover:-translate-y-0.5 hover:bg-violet-500"
+                  className={`inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r ${activeThemeConfig.btnGradientClass} px-8 py-4 text-sm font-bold shadow-xl transition-all duration-500 hover:scale-105`}
                 >
-                  Email Me
+                  <Mail className="w-4 h-4 text-slate-950" />
+                  <span>Direct Email</span>
                 </a>
                 <a
                   href={profile.github}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:border-violet-200 hover:text-violet-600"
+                  className="inline-flex items-center gap-2.5 rounded-full bg-slate-900 border border-slate-700 px-8 py-4 text-sm font-semibold text-slate-200 transition-all hover:border-slate-500 hover:text-white"
                 >
-                  GitHub
+                  <GithubIcon className="w-4 h-4 text-slate-300" />
+                  <span>GitHub</span>
                 </a>
-                <span className="ml-2 hidden text-sm font-medium text-slate-500 sm:block">
-                  {profile.email}
-                </span>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-black/5 bg-white/70">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10 text-sm font-medium text-slate-500 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-3">
-            <p className="font-bold text-slate-900">{profile.name}</p>
-            <div className="flex flex-wrap gap-4">
-              <a
-                href={profile.github}
-                target="_blank"
-                rel="noreferrer"
-                className="transition-colors hover:text-violet-600"
-              >
+      {/* FOOTER */}
+      <footer className="border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-10 text-sm font-medium text-slate-400 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <p className={`font-art-title text-lg font-bold ${activeThemeConfig.gradientClass}`}>{profile.name}</p>
+            <div className="flex flex-wrap gap-4 text-xs">
+              <a href={profile.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
                 GitHub
               </a>
-              <a
-                href={`mailto:${profile.email}`}
-                className="transition-colors hover:text-violet-600"
-              >
+              <a href={`mailto:${profile.email}`} className="hover:text-white transition-colors">
                 {profile.email}
               </a>
             </div>
           </div>
-          <p className="text-slate-400">
-            &copy; {new Date().getFullYear()} Phan Hong Tai. All rights
-            reserved.
+          <p className="text-xs text-slate-500">
+            &copy; {new Date().getFullYear()} Phan Hong Tai. Built with Next.js, Three.js & GSAP. Inspired by Monet & Van Gogh.
           </p>
         </div>
       </footer>
